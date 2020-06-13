@@ -1,0 +1,6 @@
+#Mods
+NumMods=2
+304.2022,*,fix,N-term,iTRAQ8plex
+304.2022,K,fix,any,iTRAQ8plex
+C2H3N1O1,C,fix,any,Carbamidomethyl
+O1,M,opt,any,Oxidation
