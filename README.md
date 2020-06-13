@@ -6,21 +6,22 @@ This is the workflow of  the "Proteogenomics analysis of non-coding region encod
 
 # 1. LC-MS/MS Raw Files 
 
-Prepare LC-MS/MS Raw Files. LC-MS/MS raw files of 40 normal samples from 31 healthy tissues and 926 cancer samples from five cancer types were obtained from [National Cancer Institute Clinical Proteomic Tumor Analysis Consortium ](<https://cptac-data-portal.georgetown.edu/cptac/public>) and [PRoteomics IDEntifcations](<https://www.ebi.ac.uk/pride/>) database
+Prepare LC-MS/MS Raw Files. LC-MS/MS raw files of 40 normal samples from 31 healthy tissues and 926 cancer samples from five cancer types were obtained from [National Cancer Institute Clinical Proteomic Tumor Analysis Consortium ](<https://cptac-data-portal.georgetown.edu/cptac/public>) and [PRoteomics IDEntifcations](<https://www.ebi.ac.uk/pride/>) database.
 
 # 2. Data conversion
 
 The IPAW requires the mzML files format as input files. Therefore, Convert Raw files to mzML files by [ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser).
 
-convert thr raw files using one core:
+convert the raw files using one core:
  (raw files are listed in rawfilelist.txt, one line for each file)
 ```bash
-while read f;do mono ThermoRawFileParser.exe -i="$f" -o=/hwfssz5/ST_CANCER/CGR/USER/zhuyafeng/MS_Data/LiverCancer/ -f=1 -m=1; done < rawfilelist.txt
+while read f;do mono ThermoRawFileParser.exe -i="$f" -o=/hwfssz5/ST_CANCER/CGR/USER/zhuyafeng/MS_Data/PXD000561_mzML/ -f=1 -m=1; done < rawfilelist.txt
 ```
 `-o` :the converted  output file path
+
 ` rawfilelist.txt` : contains the raw data absolute path.
 
-to run the converting in multiple cores in parallel:
+to convert the raw files in multiple cores in parallel:
 
 ```
 cat rawfilelist.txt |parallel -j 24 mono ThermoRawFileParser.exe -i={} -o=/data/home/yz332/MS_data/PXD000561_mzML/ -f=1 -m=1
@@ -56,6 +57,7 @@ To search the proteomics data of the healthy tissues, we used a core database wh
    ```
 
 **The tumor tissues**
+
 For each cancer type, **genomics data detected mutations** were downloaded from the [Cancer  Genomic Data Server](http://www.cbioportal.org/datasets) (CGDS) and then converted to mutant peptide sequences, which were added to the core database.
 For example，lung cancer database construction
 
@@ -89,6 +91,7 @@ For example，lung cancer database construction
 
 Customize the input files and parameter:
 1. A tab deliminated text file with mzmlfilepath(absolute path) and setname 
+
    `--mzmldef  adrenal_gland_filelist_setnames.txt`
 
 if you find out each set contains the same number of MS data file, you can quickly create filelist_setnames in this way:
@@ -101,11 +104,8 @@ paste filelist.txt setnames.txt > filelist_setnames.txt
 ```
 
 2. Quantitative method
-   `--mods labelfree_Mods.txt`
-    *     itraq4plex_Mods.txt  
-    *     itraq8plex_Mods.txt  
-    *     labelfree_Mods.txt  
-    *     tmt_Mods.txt
+   `--mods labelfree_Mods.txt`  (iTRAQ, TMT mod files under mod folder)
+
 3. Instrument 
    ` --inst 3`
     *    0: Low-res LCQ/LTQ (Default)
@@ -113,7 +113,7 @@ paste filelist.txt setnames.txt > filelist_setnames.txt
     *    2: TOF
     *    3: Q-Exactive
 
-More custom parameters see [here](https://github.com/lehtiolab/proteogenomics-analysis-workflow)
+An example of nextflow bash job command is shown below.
 
 ```bash
 #!/bin/bash
@@ -156,7 +156,7 @@ The resulting directory will contain the following files
     var_peptidetable.txt
 
 # 5. Score plots 
-This Script plots the distribution of retention time,  precuror mass, precursor mass error and match scores of three MS/MS database search tool( MSGF,SpecEValue, Evalue) .
+This Script plots the distribution of retention time,  precuror mass, precursor mass error and three MSGF-plus database search scores( MSGF, SpecEValue, Evalue) .
 Script :
 
 * `ScorePlotsFromIPAWPipeline.r`
@@ -174,7 +174,7 @@ Script :
 
 Require files
 * `nov_peptidetable.txt`
-* ` mart_export.txt`
+* ` mart_export.txt` can be downloaded from ENSEMBL biomart tools. See example mart_export.txt.
 ```bash
 python IDpick.py nov_peptidetable.txt temp.txt sample_nov_peptidetable.IDpick.txt
 ```
